@@ -37,6 +37,8 @@ sealed class Try<T> {
 
     operator fun invoke() = get()
 
+    fun <B> flatMap(f: (T) -> Try<B>): Try<B> = fold({ f(it) }, { Try.Failure(it) })
+
     fun getOrElse(f: () -> T): T = when (this) {
         is Success -> get()
         is Failure -> f()
@@ -56,14 +58,14 @@ sealed class Try<T> {
         it
     }
 
-    fun <X> flatMap(f: (T) -> Try<X>): Try<X> = when (this) {
-        is Success -> try {
-            f(get())
-        } catch (t: Throwable) {
-            Failure<X>(t)
-        }
-        is Failure -> Failure<X>(throwable)
-    }
+//    fun <X> flatMap(f: (T) -> Try<X>): Try<X> = when (this) {
+//        is Success -> try {
+//            f(get())
+//        } catch (t: Throwable) {
+//            Failure<X>(t)
+//        }
+//        is Failure -> Failure<X>(throwable)
+//    }
 
     fun <X> map(f: (T) -> X): Try<X> = flatMap { Success(f(it)) }
 
@@ -203,6 +205,9 @@ sealed class Try<T> {
 
     }
 
+    companion object {
+
+    }
     /*companion object {
         operator fun <T> invoke(body: () -> T): Try<T> = try {
             Success(body())
